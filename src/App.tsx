@@ -8,37 +8,19 @@ import type { Todo } from './types/Todo';
 import { getTodos } from './api/todos';
 
 export const App: React.FC = () => {
-  if (!USER_ID) {
-    return <UserWarning />;
-  }
-
   const [allTodos, setAllTodos] = useState<Todo[] | null>(null);
   const [filtered, setFiltered] = useState<Todo[] | null>(null);
   const [error, setError] = useState<string>('');
-
   const [editId, setEditId] = useState<number | null>(null);
   const [editIdValue, setEditIdValue] = useState<string>('');
-  const [isSaving, setIsSaving] = useState<number | null>(null);
-
   const [addInput, setAddInput] = useState<string>('');
   const [filter, setFilter] = useState<string>('all');
-
-  const handleAddTodo = (title: string) => {
-    console.log('Creating todo:', title);
-  };
-
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (addInput.trim() !== '') {
-      handleAddTodo(addInput);
-      setAddInput('');
-    }
-  };
 
   useEffect(() => {
     (async () => {
       try {
         const todosFromServer = await getTodos();
+
         setAllTodos(todosFromServer);
         setFiltered(todosFromServer);
       } catch {
@@ -61,13 +43,23 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     const filteredTodos: Todo[] | null = allTodos?.filter(todo => {
-      if (filter === 'completed') return todo.completed;
-      if (filter === 'active') return !todo.completed;
+      if (filter === 'completed') {
+        return todo.completed;
+      }
+
+      if (filter === 'active') {
+        return !todo.completed;
+      }
+
       return true;
     });
 
     setFiltered(filteredTodos);
-  });
+  }, [allTodos, filter]);
+
+  if (!USER_ID) {
+    return <UserWarning />;
+  }
 
   return (
     <div className="todoapp">
@@ -83,7 +75,7 @@ export const App: React.FC = () => {
           />
 
           {/* Add a todo on form submit */}
-          <form onSubmit={onSubmit}>
+          <form>
             <input
               data-cy="NewTodoField"
               type="text"
@@ -143,10 +135,7 @@ export const App: React.FC = () => {
                 ×
               </button>
 
-              <div
-                data-cy="TodoLoader"
-                className={`modal overlay ${isSaving === item.id ? 'is-active' : ''}`}
-              >
+              <div data-cy="TodoLoader" className={`modal overlay`}>
                 <div className="modal-background has-background-white-ter" />
                 <div className="loader" />
               </div>

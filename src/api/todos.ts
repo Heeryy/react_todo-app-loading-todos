@@ -11,6 +11,7 @@ function wait(delay: number): Promise<void> {
 
 export const getTodos = async () => {
   await wait(300);
+
   return client.get<Todo[]>(`/todos?userId=${USER_ID}`);
 };
 
