@@ -50,7 +50,7 @@ export default function Footer({
         type="button"
         className="todoapp__clear-completed"
         data-cy="ClearCompletedButton"
-        disabled={!filtered?.some(item => item.completed)}
+        disabled={!allTodos?.some(item => item.completed)}
       >
         Clear completed
       </button>
